@@ -14,24 +14,24 @@ import com.example.demo.entity.Memo;
 
 @Controller
 public class MemoController {
-	
+
 	List<Memo> memoList = new ArrayList<>();
-	
+
 	@GetMapping("/memo")
 	public String showMemo(Model model) {
 		model.addAttribute("memoList", memoList);
 		return "memo-list";
 	}
-	
+
 	@PostMapping("/addMemo")
 	public String addMemo(@RequestParam String title,
 			@RequestParam String message) {
-		
+
 		memoList.add(new Memo(title, message));
-		
+
 		return "redirect:/memo";
 	}
-	
+
 	@PostMapping("/delMemo/{id}")
 	public String delMemo(@PathVariable int id) {
 		memoList.removeIf(memo -> memo.getId() == id); //変数memoにmemoListのオブジェクトを代入している
