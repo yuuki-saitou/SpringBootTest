@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>メモ帳</title>
+</head>
+<body>
+	<h1>メモ</h1>
+	
+	
+		<form action="/addMemo" method="post">
+			<label for="title">タイトル</label><br>
+			<input type="text" id="title" name="title" placeholder="タイトルを入力"><br>
+			<label for="message">メッセージ</label><br>
+			<input type="text"id ="message" name="message" placeholder="メッセージを入力"><br>
+			
+			<button type="submit">追加</button>
+				
+			
+		</form>
+	<ul>
+		<li th:each="memo : ${memoList}">
+			<span th:text="${memo.title}">タイトル</span><br>
+			<span th:text="${memo.message}">メッセージ</span>
+			
+			<form th:action="@{/delMemo/{id}(id=${memo.id})}" method="post" style="display:inline"><br>
+				<button type="submit">削除</button>
+			</form>
+			
+		</li>
+	</ul>
+
+</body>
+</html>
