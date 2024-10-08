@@ -2,33 +2,60 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>メモ帳</title>
+<title>メモ</title>
 </head>
 <body>
-	<h1>メモ</h1>
+	
+	<h1>MEMO</h1>
+	
+	<style>
+	    .completed {
+	        text-decoration: line-through;
+	    }
+	</style>
 	
 	
-		<form action="/addMemo" method="post">
-			<label for="title">タイトル</label><br>
-			<input type="text" id="title" name="title" placeholder="タイトルを入力"><br>
-			<label for="message">メッセージ</label><br>
-			<input type="text"id ="message" name="message" placeholder="メッセージを入力"><br>
-			
-			<button type="submit">追加</button>
-				
-			
-		</form>
+	<form th:action="@{/addMemo}" method="post">
+		<label for="memo">タイトル</label><br>
+		<input type="text" id="memo" name="memo" placeholder="ここに入力してください" required><br>
+		<label for="message">本文</label><br>
+		<textarea rows="6" cols="50" id="message" name="message" placeholder="ここに入力してください" required></textarea><br>
+		
+		<input type="submit" value="メモを追加">
+	</form>
+	
+	
+	<br>
+
+	
+	
+	<h3>メモ一覧</h3>
+	
+
+	
 	<ul>
-		<li th:each="memo : ${memoList}">
-			<span th:text="${memo.title}">タイトル</span><br>
-			<span th:text="${memo.message}">メッセージ</span>
-			
-			<form th:action="@{/delMemo/{id}(id=${memo.id})}" method="post" style="display:inline"><br>
-				<button type="submit">削除</button>
-			</form>
-			
-		</li>
+		<th:block th:each="memo : ${memos}">
+			<li>
+				<strong th:text="${memo.title}" th:classappend="${memo.completed} ? 'completed' : ''">タイトル</strong><br>
+				<span th:text="${memo.message}" th:classappend="${memo.completed} ? 'completed' : ''">本文</span>
+				<form th:action="@{/deleteMemo}" method="post" style="display:inline;">
+					<input type="hidden" name="id" th:value="${memo.id}">
+					<button type="submit">削除</button>
+				</form>
+				<form th:action="@{/completeMemo}" method="post" style="display:inline;">
+					<input type="hidden" name="id" th:value="${memo.id}">
+					<button type="submit" th:text="${memo.completed} ? '未完了' : '完了'"></button>
+				</form>
+ 			</li>
+		</th:block>
+		
+		
 	</ul>
+	
+	
+	<div>
+		<a th:href="@{/memo/sort(order=asc)}">昇順</a><br>
+		<a th:href="@{/memo/sort(order=desc)}">降順</a>
+	</div>
 
 </body>
-</html>

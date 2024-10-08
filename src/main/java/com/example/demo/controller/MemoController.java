@@ -1,12 +1,13 @@
+
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -19,23 +20,47 @@ public class MemoController {
 
 	@GetMapping("/memo")
 	public String showMemo(Model model) {
-		model.addAttribute("memoList", memoList);
+
+		model.addAttribute("memos", memoList);
+
 		return "memo-list";
 	}
 
 	@PostMapping("/addMemo")
-	public String addMemo(@RequestParam String title,
-			@RequestParam String message) {
+	public String addMemo(@RequestParam("memo") String title,
+			@RequestParam("message") String message) {
 
 		memoList.add(new Memo(title, message));
 
 		return "redirect:/memo";
+
 	}
 
-	@PostMapping("/delMemo/{id}")
-	public String delMemo(@PathVariable int id) {
-		memoList.removeIf(memo -> memo.getId() == id); //変数memoにmemoListのオブジェクトを代入している
+	@GetMapping("/memo/sort")
+	public String sortMemo(@RequestParam("order") String order, Model model) {
+		if ("desc".equals(order)) {
+			memoList.sort(Comparator.comparing(Memo::getTitle).reversed());
+		} else {
+			memoList.sort(Comparator.comparing(Memo::getTitle));
+		}
+		model.addAttribute("memos", memoList);
+		return "memo-list";
+	}
+
+	@PostMapping("/deleteMemo")
+	public String deleteMemo(@RequestParam("id") int id) {
+		memoList.removeIf(memo -> memo.getId() == id);
 		return "redirect:/memo";
+	}
+
+	@PostMapping("completeMemo")
+	public String completeMemo(@RequestParam("id") int id) {
+		memoList.stream()
+				.filter(memo -> memo.getId() == id)
+				.findFirst()
+				.ifPresent(memo -> memo.setCompleted(!memo.isCompleted()));
+		return "redirect:/memo";
+
 	}
 
 }
