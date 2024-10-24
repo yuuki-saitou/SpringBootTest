@@ -2,7 +2,6 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class MemoController {
 	@GetMapping("/memo")
 	public String showMemo(Model model) {
 
-		model.addAttribute("memos", memoList);
+		model.addAttribute("memos", memoService.getAllMemos());
 
 		return "memo-list";
 	}
@@ -35,7 +34,8 @@ public class MemoController {
 	public String addMemo(@RequestParam("memo") String title,
 			@RequestParam("message") String message) {
 
-		memoList.add(new Memo(title, message));
+		//memoList.add(new Memo(title, message));
+		memoService.addMemo(new Memo(title, message));
 
 		return "redirect:/memo";
 
@@ -43,19 +43,9 @@ public class MemoController {
 
 	@GetMapping("/memo/sort")
 	public String sortMemo(@RequestParam("order") String order, Model model) {
-		if ("desc".equals(order)) {
-			memoList.sort(Comparator.comparing(Memo::getTitle).reversed());
-		} else {
-			memoList.sort(Comparator.comparing(Memo::getTitle));
-		}
-		model.addAttribute("memos", memoList);
+		List<Memo> sortedMemos = memoService.getSortMemos(order); // サービスクラスのメソッドを呼び出す
+		model.addAttribute("memos", sortedMemos); // ソート済みのメモリストをモデルに追加
 		return "memo-list";
-	}
-
-	@PostMapping("/deleteMemo")
-	public String deleteMemo(@RequestParam("id") int id) {
-		memoList.removeIf(memo -> memo.getId() == id);
-		return "redirect:/memo";
 	}
 
 	@PostMapping("completeMemo")
@@ -66,6 +56,12 @@ public class MemoController {
 				.ifPresent(memo -> memo.setCompleted(!memo.isCompleted()));
 		return "redirect:/memo";
 
+	}
+
+	@PostMapping("/deleteMemo")
+	public String deleteMemo(@RequestParam("id") int id) {
+		memoService.deleteMemoById(id);
+		return "redirect:/memo";
 	}
 
 }
